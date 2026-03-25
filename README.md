@@ -1,3 +1,7 @@
+And absolutely daft BBS test thing, using Vercel, Supabase SQL, etc etc.
+All ClaudeCode stuff.
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
