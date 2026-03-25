@@ -1,26 +1,87 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #000000;
+  color: #00ff41;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  margin: 0;
+  padding: 0;
+}
+
+/* CRT scanline effect */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* CRT flicker */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  97% { opacity: 1; }
+  98% { opacity: 0.97; }
+  99% { opacity: 1; }
+}
+
+.crt-screen {
+  animation: flicker 8s infinite;
+  text-shadow: 0 0 8px #00ff41, 0 0 2px #00ff41;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+.scrollbar-bbs::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-bbs::-webkit-scrollbar-track {
+  background: #001a00;
+}
+.scrollbar-bbs::-webkit-scrollbar-thumb {
+  background: #00ff41;
+}
+
+input, textarea {
+  background-color: #001a00 !important;
+  color: #00ff41 !important;
+  border: 1px solid #00ff41 !important;
+  caret-color: #00ff41;
+  font-family: 'Share Tech Mono', 'Courier New', monospace !important;
+  outline: none !important;
+}
+
+input:focus, textarea:focus {
+  box-shadow: 0 0 8px #00ff41, inset 0 0 4px rgba(0,255,65,0.1) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #006b1b !important;
+}
+
+button {
+  font-family: 'Share Tech Mono', 'Courier New', monospace !important;
 }
