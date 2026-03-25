@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSupabase } from '@/lib/supabase'
+import { auth } from '@/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,20 +24,22 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.name) {
+    return NextResponse.json({ error: 'You must be logged in to post' }, { status: 401 })
+  }
+
   const supabase = getSupabase()
   if (!supabase) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
   }
 
   const body = await request.json()
-  const { handle, message } = body
+  const { message } = body
+  const handle = session.user.name
 
-  if (!handle || !message) {
-    return NextResponse.json({ error: 'Handle and message are required' }, { status: 400 })
-  }
-
-  if (handle.length > 20) {
-    return NextResponse.json({ error: 'Handle must be 20 characters or less' }, { status: 400 })
+  if (!message) {
+    return NextResponse.json({ error: 'Message is required' }, { status: 400 })
   }
 
   if (message.length > 500) {
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from('messages')
-    .insert([{ handle: handle.trim(), message: message.trim() }])
+    .insert([{ handle, message: message.trim() }])
     .select()
     .single()
 
