@@ -4,6 +4,32 @@ import { useState, useEffect } from 'react'
 import { useSession, signIn, signOut } from 'next-auth/react'
 import type { Message } from '@/lib/supabase'
 
+// ── Responsive panel box ──────────────────────────────────────────────────
+
+function Panel({
+  title,
+  children,
+  footer,
+}: {
+  title: string
+  children: React.ReactNode
+  footer?: React.ReactNode
+}) {
+  return (
+    <div className="relative border border-green-800 mb-4 pt-4 pb-0">
+      <span className="absolute -top-2.5 left-3 bg-black px-2 text-green-600 text-xs select-none">
+        ── {title} ──
+      </span>
+      <div className="p-3">{children}</div>
+      {footer && (
+        <div className="border-t border-green-900 px-3 py-1 flex justify-end">
+          {footer}
+        </div>
+      )}
+    </div>
+  )
+}
+
 const ASCII_BANNER = `
  ██████╗ ██████╗ ███████╗███████╗███╗   ██╗    ██████╗ ██████╗ ███████╗
 ██╔════╝ ██╔══██╗██╔════╝██╔════╝████╗  ██║    ██╔══██╗██╔══██╗██╔════╝
@@ -126,11 +152,8 @@ function AuthPanel({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div>
-      <div className="text-green-600 text-xs">
-        ┌──────────────────────────────────── LOGON ─────────────────────────────────────────┐
-      </div>
-      <div className="border-x border-green-800 bg-black p-3 space-y-3">
+    <Panel title="LOGON">
+      <div className="space-y-3">
         {/* Mode tabs */}
         <div className="flex gap-2">
           <button
@@ -213,10 +236,7 @@ function AuthPanel({ onSuccess }: { onSuccess: () => void }) {
           </div>
         </form>
       </div>
-      <div className="text-green-600 text-xs">
-        └────────────────────────────────────────────────────────────────────────────────────┘
-      </div>
-    </div>
+    </Panel>
   )
 }
 
@@ -249,60 +269,52 @@ function ComposePanel({ handle, onPosted }: { handle: string; onPosted: (status:
   }
 
   return (
-    <div>
-      <div className="text-green-600 text-xs">
-        ┌─────────────────────────────── COMPOSE MESSAGE ────────────────────────────────────┐
-      </div>
-      <div className="border-x border-green-800 bg-black p-3">
-        <form onSubmit={handlePost} className="space-y-2">
-          <div className="flex items-center gap-2">
-            <label className="text-green-600 text-xs w-24 shrink-0">FROM:</label>
-            <span className="text-yellow-400 text-sm">{handle.toUpperCase()}</span>
-            <button
-              type="button"
-              onClick={() => signOut()}
-              className="ml-auto px-3 py-0.5 text-xs border border-green-800 text-green-700 hover:border-red-700 hover:text-red-500 transition-colors cursor-pointer"
-            >
-              [ LOG OFF ]
-            </button>
-          </div>
-          <div className="flex gap-2">
-            <label className="text-green-600 text-xs w-24 shrink-0 pt-1">MESSAGE:</label>
-            <div className="flex-1 min-w-0">
-              <textarea
-                value={messageText}
-                onChange={e => setMessageText(e.target.value)}
-                placeholder="TYPE YOUR MESSAGE HERE..."
-                maxLength={500}
-                rows={4}
-                className="w-full px-2 py-1 text-sm resize-none"
-                style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}
-                disabled={busy}
-              />
-              <div className="flex justify-between text-xs text-green-700 mt-0.5">
-                {status
-                  ? <span className={status.startsWith('ERR') ? 'text-red-400' : 'text-green-400'}>{status}</span>
-                  : <span />
-                }
-                <span>{messageText.length}/500</span>
-              </div>
+    <Panel title="COMPOSE MESSAGE">
+      <form onSubmit={handlePost} className="space-y-2">
+        <div className="flex items-center gap-2">
+          <label className="text-green-600 text-xs w-24 shrink-0">FROM:</label>
+          <span className="text-yellow-400 text-sm">{handle.toUpperCase()}</span>
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="ml-auto px-3 py-0.5 text-xs border border-green-800 text-green-700 hover:border-red-700 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            [ LOG OFF ]
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <label className="text-green-600 text-xs w-24 shrink-0 pt-1">MESSAGE:</label>
+          <div className="flex-1 min-w-0">
+            <textarea
+              value={messageText}
+              onChange={e => setMessageText(e.target.value)}
+              placeholder="TYPE YOUR MESSAGE HERE..."
+              maxLength={500}
+              rows={4}
+              className="w-full px-2 py-1 text-sm resize-none"
+              style={{ wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-wrap' }}
+              disabled={busy}
+            />
+            <div className="flex justify-between text-xs text-green-700 mt-0.5">
+              {status
+                ? <span className={status.startsWith('ERR') ? 'text-red-400' : 'text-green-400'}>{status}</span>
+                : <span />
+              }
+              <span>{messageText.length}/500</span>
             </div>
           </div>
-          <div className="pl-24">
-            <button
-              type="submit"
-              disabled={busy}
-              className="px-4 py-0.5 text-sm border border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition-colors disabled:opacity-50 cursor-pointer"
-            >
-              {busy ? '[ SENDING... ]' : '[ POST MESSAGE ]'}
-            </button>
-          </div>
-        </form>
-      </div>
-      <div className="text-green-600 text-xs">
-        └────────────────────────────────────────────────────────────────────────────────────┘
-      </div>
-    </div>
+        </div>
+        <div className="pl-24">
+          <button
+            type="submit"
+            disabled={busy}
+            className="px-4 py-0.5 text-sm border border-green-400 text-green-400 hover:bg-green-400 hover:text-black transition-colors disabled:opacity-50 cursor-pointer"
+          >
+            {busy ? '[ SENDING... ]' : '[ POST MESSAGE ]'}
+          </button>
+        </div>
+      </form>
+    </Panel>
   )
 }
 
@@ -359,11 +371,19 @@ export default function Home() {
       </div>
 
       {/* ── Message Board ── */}
-      <div className="mb-4">
-        <div className="text-green-600 text-xs">
-          ┌──────────────────────────────── MESSAGE BASE ───────────────────────────────────────┐
-        </div>
-        <div className="border-x border-green-800 bg-black min-h-40 max-h-[36rem] overflow-y-auto scrollbar-bbs p-2">
+      <Panel
+        title="MESSAGE BASE"
+        footer={
+          <button
+            onClick={fetchMessages}
+            disabled={isLoading}
+            className="text-green-700 hover:text-green-400 transition-colors disabled:opacity-40 cursor-pointer text-xs"
+          >
+            [ REFRESH ]
+          </button>
+        }
+      >
+        <div className="min-h-40 max-h-[36rem] overflow-y-auto scrollbar-bbs -m-3 px-2 py-2">
           {isLoading && (
             <div className="text-green-600 text-sm">
               LOADING MESSAGES<span className="blink">_</span>
@@ -388,17 +408,7 @@ export default function Home() {
             </div>
           ))}
         </div>
-        <div className="text-green-600 text-xs flex justify-between items-center">
-          <span>└──────────────────────────────────────────────────────────────────────────────────────┘</span>
-          <button
-            onClick={fetchMessages}
-            disabled={isLoading}
-            className="text-green-700 hover:text-green-400 transition-colors disabled:opacity-40 cursor-pointer ml-2 shrink-0"
-          >
-            [REFRESH]
-          </button>
-        </div>
-      </div>
+      </Panel>
 
       {/* ── Auth / Compose ── */}
       {!authReady && (
